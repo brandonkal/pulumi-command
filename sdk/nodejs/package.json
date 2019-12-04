@@ -1,0 +1,24 @@
+{
+  "name": "@brandonkal/pulumi-command",
+  "version": "0.1.0",
+  "description": "A Pulumi package for running arbitrary commands.",
+  "license": "Apache-2.0",
+  "keywords": [
+    "pulumi",
+    "command",
+    "shell"
+  ],
+  "repository": "https://github.com/brandonkal/pulumi-command",
+  "scripts": {
+    "build": "tsc"
+  },
+  "pulumi": {
+    "resource": true
+  },
+  "devDependencies": {
+    "typescript": "^3.7.2"
+  },
+  "dependencies": {
+    "@pulumi/pulumi": "^1.6.1"
+  }
+}
