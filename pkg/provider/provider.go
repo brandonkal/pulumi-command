@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+	"os/exec"
 
 	"github.com/golang/glog"
 	pbempty "github.com/golang/protobuf/ptypes/empty"
@@ -13,7 +14,7 @@ import (
 	pulumirpc "github.com/pulumi/pulumi/sdk/proto/go"
 )
 
-const commandType = "command"
+const commandType = "command:exec:command"
 
 type cancellationContext struct {
 	context context.Context
@@ -115,6 +116,8 @@ func (p *commandProvider) Check(ctx context.Context, req *pulumirpc.CheckRequest
 		return nil, errors.Errorf("unknown resource type %v", urn.Type())
 	}
 
+	// map[create:{map[command:{[{echo} {hello}]}]} diff:{map[command:{[{echo} {hello}]}]} update:{map[command:{[{echo} {hello}]}]}]
+
 	// news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{
 	// 	Label: fmt.Sprintf("%s.news", label), KeepUnknowns: true, SkipNulls: true,
 	// })
@@ -153,12 +156,26 @@ func (p *commandProvider) Create(ctx context.Context, req *pulumirpc.CreateReque
 		return nil, errors.Errorf("unknown resource type %v", urn.Type())
 	}
 
-	_, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{
+	newResInputs, err := plugin.UnmarshalProperties(req.GetProperties(), plugin.MarshalOptions{
 		Label: fmt.Sprintf("%s.properties", label), KeepUnknowns: true, SkipNulls: true,
 	})
 	if err != nil {
 		return nil, err
 	}
+
+	glog.V(1).Infoln("newResInputs are:")
+	glog.V(1).Info(newResInputs)
+
+	// map[create:{map[command:{[{echo} {hello}]}]} diff:{map[command:{[{echo} {hello}]}]} update:{map[command:{[{echo} {hello}]}]}]
+	glog.V(1).Info(newResInputs["create"])
+	cr := newResInputs["create"]
+	// createArgs := cr["command"]
+	theMap := newResInputs.Copy()
+
+	// Execute the Command
+	cmd := exec.CommandContext(ctx, "echo", "hello world")
+	cmd.Run()
+	cmd.Env = []string{"SOMETHING=true"}
 
 	// var f function
 	// if err := decodeProperties(newResInputs, &f); err != nil {

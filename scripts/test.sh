@@ -26,9 +26,9 @@ pulumi --non-interactive stack init "command-test"
 
 echo $PATH
 echo 'Running pulumi up =================================='
-pulumi --non-interactive up --skip-preview -v 9 --logflow
+pulumi --non-interactive -v ${PULUMI_LOGLEVEL} --logflow --logtostderr up --skip-preview
+echo 'Repeat pulumi up ================================'
+pulumi --non-interactive -v ${PULUMI_LOGLEVEL} --logflow --logtostderr up --skip-preview
 echo 'Done with pulumi up ================================'
 
-pulumi --non-interactive destroy
-pulumi --non-interactive stack rm "command-test" -y
 popd
