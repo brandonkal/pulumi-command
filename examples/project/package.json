@@ -1,0 +1,19 @@
+{
+  "name": "pulumi-command-test",
+  "private": true,
+  "version": "0.1",
+  "main": "bin/index.js",
+  "typings": "bin/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "peerDependencies": {
+    "@brandonkal/pulumi-command": "latest"
+  },
+  "devDependencies": {
+    "typescript": "^3.7.2"
+  },
+  "dependencies": {
+    "@pulumi/pulumi": "^1.6.1"
+  }
+}

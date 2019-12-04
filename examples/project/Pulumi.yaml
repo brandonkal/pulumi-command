@@ -1,0 +1,3 @@
+name: command-test
+description: A Command Test.
+runtime: nodejs

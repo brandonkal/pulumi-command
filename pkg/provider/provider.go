@@ -7,6 +7,7 @@ import (
 	"github.com/golang/glog"
 	pbempty "github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
+	pkgerrors "github.com/pkg/errors"
 	"github.com/pulumi/pulumi/pkg/resource"
 	"github.com/pulumi/pulumi/pkg/resource/plugin"
 	pulumirpc "github.com/pulumi/pulumi/sdk/proto/go"
@@ -42,18 +43,46 @@ func makeCommandProvider(name, version string) (pulumirpc.ResourceProviderServer
 }
 
 // CheckConfig validates the configuration for this resource provider.
-func (p *commandProvider) CheckConfig(context.Context, *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
-	panic("CheckConfig not implemented")
+func (p *commandProvider) CheckConfig(ctx context.Context, req *pulumirpc.CheckRequest) (*pulumirpc.CheckResponse, error) {
+	return &pulumirpc.CheckResponse{Inputs: req.GetNews()}, nil
 }
 
 // DiffConfig checks the impact a hypothetical change to this provider's configuration will have on the provider.
-func (p *commandProvider) DiffConfig(context.Context, *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
-	panic("DiffConfig not implemented")
+func (p *commandProvider) DiffConfig(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+	urn := resource.URN(req.GetUrn())
+	label := fmt.Sprintf("%s.DiffConfig(%s)", p.label(), urn)
+	glog.V(9).Infof("%s executing", label)
+
+	olds, err := plugin.UnmarshalProperties(req.GetOlds(), plugin.MarshalOptions{
+		Label:        fmt.Sprintf("%s.olds", label),
+		KeepUnknowns: true,
+		SkipNulls:    true,
+	})
+	if err != nil {
+		return nil, err
+	}
+	news, err := plugin.UnmarshalProperties(req.GetNews(), plugin.MarshalOptions{
+		Label:        fmt.Sprintf("%s.news", label),
+		KeepUnknowns: true,
+		SkipNulls:    true,
+		RejectAssets: true,
+	})
+	if err != nil {
+		return nil, pkgerrors.Wrapf(err, "diffconfig failed because malformed resource inputs")
+	}
+	glog.V(9).Infof("OLDS:  %s", olds)
+	glog.V(9).Infof("NEWS:  %s", news)
+
+	return &pulumirpc.DiffResponse{
+		Changes: pulumirpc.DiffResponse_DIFF_NONE,
+	}, nil
 }
 
 // Configure configures the resource provider with "globals" that control its behavior.
-func (p *commandProvider) Configure(context.Context, *pulumirpc.ConfigureRequest) (*pulumirpc.ConfigureResponse, error) {
-	panic("Configure not implemented")
+func (p *commandProvider) Configure(ctx context.Context, req *pulumirpc.ConfigureRequest) (*pulumirpc.ConfigureResponse, error) {
+	return &pulumirpc.ConfigureResponse{
+		AcceptSecrets: true,
+	}, nil
 }
 
 func (p *commandProvider) label() string {
@@ -61,7 +90,7 @@ func (p *commandProvider) label() string {
 }
 
 // Invoke dynamically executes a built-in command in the provider.
-func (p *commandProvider) Invoke(context.Context, *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
+func (p *commandProvider) Invoke(ctx context.Context, req *pulumirpc.InvokeRequest) (*pulumirpc.InvokeResponse, error) {
 	panic("Invoke not implemented")
 }
 
@@ -160,7 +189,7 @@ func (p *commandProvider) Create(ctx context.Context, req *pulumirpc.CreateReque
 // Read the current live state associated with a resource.  Enough state must be include in the inputs to uniquely
 // identify the resource; this is typically just the resource ID, but may also include some properties.
 func (p *commandProvider) Read(context.Context, *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	panic("Read not implemented")
+	return &pulumirpc.ReadResponse{}, errors.New("Read not implemented")
 }
 
 func (p *commandProvider) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {

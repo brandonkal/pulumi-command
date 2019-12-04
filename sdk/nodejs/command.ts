@@ -18,6 +18,6 @@ export interface CommandArgs {
  */
 export class Command extends pulumi.CustomResource {
   constructor(name: string, args: CommandArgs, opts?: pulumi.ResourceOptions) {
-    super('command', name, args, opts)
+    super('command:exec:command', name, args, opts)
   }
 }
