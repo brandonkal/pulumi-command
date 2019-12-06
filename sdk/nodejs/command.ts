@@ -3,14 +3,15 @@ import * as pulumi from '@pulumi/pulumi'
 export interface Cmd {
   /** Specifiy the command to run as an array of arguments */
   command: string[]
+  /** Pass the stdin to a command */
+  stdin?: string
   /** Set environment variables for the running command */
   environment?: Record<string, string>
-  /** Kill the Process after a specified number of milliseconds if specified */
-  timeout?: number
 }
 
 export interface CommandArgs {
-  /** Specify a command to run to diff the resource. If not specified, update will always run. */
+  /** Specify a command to run to diff the resource. Exit 0 to run update.
+   * Exit with a non-zero value or omit to disable update. */
   diff?: Cmd
   /** Specify a command to create a resource. */
   create: Cmd

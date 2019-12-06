@@ -1,11 +1,14 @@
-import * as command from '@brandonkal/pulumi-command'
+import { Command } from '@brandonkal/pulumi-command'
 
-const cmd = new command.Command('test', {
+const cmd = new Command('test', {
   diff: {
-    command: ['echo', 'hello'],
+    command: ['false'],
   },
   create: {
-    command: ['echo', 'hello'],
+    command: ['ls'],
+    environment: {
+      VAR: 'hello world!',
+    },
   },
   update: {
     command: ['echo', 'hello'],

@@ -17,18 +17,16 @@ yarn link
 popd
 
 export PATH=$PATH:$PWD/cmd/pulumi-resource-command
-echo $PATH
 
 pushd ./examples/project
 yarn install
 pulumi --non-interactive destroy && pulumi --non-interactive stack rm "command-test" -y --force
 pulumi --non-interactive stack init "command-test"
 
-echo $PATH
 echo 'Running pulumi up =================================='
-pulumi --non-interactive -v ${PULUMI_LOGLEVEL} --logflow --logtostderr up --skip-preview
+pulumi --non-interactive -v ${PULUMI_LOGLEVEL:-1} --logflow --logtostderr up --skip-preview
 echo 'Repeat pulumi up ================================'
-pulumi --non-interactive -v ${PULUMI_LOGLEVEL} --logflow --logtostderr up --skip-preview
+pulumi --non-interactive -v ${PULUMI_LOGLEVEL:-1} --logflow --logtostderr up --skip-preview
 echo 'Done with pulumi up ================================'
 
 popd
