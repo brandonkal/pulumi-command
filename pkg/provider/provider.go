@@ -106,8 +106,8 @@ func (p *commandProvider) execCommand(ctx context.Context, req hasUrn, op string
 	err = cmd.Run()
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
+			glog.V(1).Infof("Command exit with code: %v", code)
 			code = exitError.ExitCode()
-			glog.V(1).Info(code)
 		}
 
 		return nil, err, code

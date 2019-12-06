@@ -7,6 +7,4 @@ require (
 	github.com/golang/protobuf v1.3.1
 	github.com/pkg/errors v0.8.1
 	github.com/pulumi/pulumi v1.6.1
-	github.com/pulumi/pulumi-openfaas v0.0.0-20190104194558-589821c3689e
-	google.golang.org/grpc v1.21.1
 )
