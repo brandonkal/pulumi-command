@@ -15,7 +15,7 @@ yarn install
 yarn build
 yarn link
 popd
-cp README.md sdk/nodejs/yarn.lock sdk/nodejs/package.json  sdk/nodejs/bin/
+cp README.md LICENSE sdk/nodejs/yarn.lock sdk/nodejs/package.json  sdk/nodejs/bin/
 
 export PATH=$PATH:$PWD/cmd/pulumi-resource-command
 

@@ -1,8 +1,9 @@
+import * as pulumi from '@pulumi/pulumi'
 import { Command } from '@brandonkal/pulumi-command'
 
 const cmd = new Command('demo', {
   diff: {
-    command: ['false'],
+    command: ['true'],
   },
   create: {
     command: ['ls'],
@@ -14,3 +15,5 @@ const cmd = new Command('demo', {
     },
   },
 })
+
+export const out = cmd.stdout
