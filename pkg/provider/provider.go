@@ -192,7 +192,7 @@ func (p *commandProvider) Diff(ctx context.Context, req *pulumirpc.DiffRequest) 
 	_, err, code := p.execCommand(ctx, req, "diff", req.GetNews())
 	if err != nil {
 		// If the user doesn't provide a diff command, we never run update
-		if code != 0 || err.Error() != "diff command unspecified" {
+		if code != 0 || err.Error() == "diff command unspecified" {
 			diff = pulumirpc.DiffResponse_DIFF_NONE
 		} else {
 			return nil, err
