@@ -1,3 +1,17 @@
+// Copyright 2019, Brandon Kalinowski.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package provider
 
 import (
@@ -177,7 +191,8 @@ func (p *commandProvider) Diff(ctx context.Context, req *pulumirpc.DiffRequest) 
 	diff := pulumirpc.DiffResponse_DIFF_SOME
 	_, err, code := p.execCommand(ctx, req, "diff", req.GetNews())
 	if err != nil {
-		if code != 0 {
+		// If the user doesn't provide a diff command, we never run update
+		if code != 0 || err.Error() != "diff command unspecified" {
 			diff = pulumirpc.DiffResponse_DIFF_NONE
 		} else {
 			return nil, err

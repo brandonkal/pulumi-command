@@ -4,4 +4,4 @@ This is a simple Pulumi provider that allows one to run arbitrary commands and t
 
 It is important to ensure that the output of a command is deterministic. If it is not, use the diff command to ensure the net results are deterministic.
 
-(c) Brandon Kalinowski
+© Brandon Kalinowski. Apache-2.0.
