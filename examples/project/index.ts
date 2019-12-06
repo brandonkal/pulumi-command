@@ -1,16 +1,16 @@
 import { Command } from '@brandonkal/pulumi-command'
 
-const cmd = new Command('test', {
+const cmd = new Command('demo', {
   diff: {
     command: ['false'],
   },
   create: {
     command: ['ls'],
-    environment: {
-      VAR: 'hello world!',
-    },
   },
   update: {
-    command: ['echo', 'hello'],
+    command: ['bash', '-c', 'echo $VAR'],
+    environment: {
+      VAR: 'Hello Pulumi!',
+    },
   },
 })
