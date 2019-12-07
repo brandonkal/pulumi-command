@@ -222,11 +222,15 @@ type hasUrn interface {
 // Read the current live state associated with a resource.  Enough state must be include in the inputs to uniquely
 // identify the resource; this is typically just the resource ID, but may also include some properties.
 func (p *commandProvider) Read(ctx context.Context, req *pulumirpc.ReadRequest) (*pulumirpc.ReadResponse, error) {
-	out, err, _ := p.execCommand(ctx, req, "diff", req.GetProperties())
-	if err != nil {
+	out, err, _ := p.execCommand(ctx, req, "read", req.GetInputs())
+	if err != nil && err.Error() != "read command unspecified" {
 		return nil, err
 	}
-	return &pulumirpc.ReadResponse{Properties: out}, nil
+	properties := req.GetProperties()
+	if err.Error() != "read command unspecified" {
+		properties = out
+	}
+	return &pulumirpc.ReadResponse{Id: req.GetId(), Properties: properties}, nil
 }
 
 func (p *commandProvider) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
