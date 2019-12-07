@@ -190,13 +190,12 @@ func (p *commandProvider) Check(ctx context.Context, req *pulumirpc.CheckRequest
 func (p *commandProvider) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
 	diff := pulumirpc.DiffResponse_DIFF_SOME
 	_, err, code := p.execCommand(ctx, req, "diff", req.GetNews())
-	if err != nil {
-		// If the user doesn't provide a diff command, we never run update
-		if code != 0 || err.Error() == "diff command unspecified" {
-			diff = pulumirpc.DiffResponse_DIFF_NONE
-		} else {
-			return nil, err
-		}
+	// If the user doesn't provide a diff command, we never run update
+	if err != nil && err.Error() != "diff command unspecified" {
+		return nil, err
+	}
+	if code == 0 {
+		diff = pulumirpc.DiffResponse_DIFF_NONE
 	}
 	return &pulumirpc.DiffResponse{
 		Replaces:            []string{},
