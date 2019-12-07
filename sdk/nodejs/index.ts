@@ -31,13 +31,13 @@ export interface CommandSet {
    * Exit with a non-zero value or omit to disable update.
    * Hint: an easy method to always run update is to set diff to `['true']` */
   readonly diff?: pulumi.Input<Cmd>
-  /** Specify a command to create a resource. */
+  /** Define a command to create a resource. */
   readonly create: pulumi.Input<Cmd>
-  /** Specify a command to create read the resource. */
+  /** Define a command to create read the resource. */
   readonly read?: pulumi.Input<Cmd>
-  /** Specify a command to update the resource. */
-  readonly update: pulumi.Input<Cmd>
-  /** Specify a command to delete the resource. If unspecified, a delete operation is a no-op. */
+  /** If unspecified, create definition will be used. Define to provide an alternate update command. */
+  readonly update?: pulumi.Input<Cmd>
+  /** Define a command to delete the resource. If unspecified, a delete operation is a no-op. */
   readonly delete?: pulumi.Input<Cmd>
 }
 
@@ -53,6 +53,9 @@ export class Command extends pulumi.CustomResource {
   ) {
     ;(args as any).stdout = undefined /* out */
     ;(args as any).stderr = undefined /* out */
+    if (typeof args.update === 'undefined') {
+      ;(args as any).update = args.create
+    }
     super('command:exec:command', name, args, opts)
   }
 }
