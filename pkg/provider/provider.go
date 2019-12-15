@@ -22,6 +22,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/brandonkal/pulumi-command/pkg/structpbconv"
 	"github.com/golang/glog"
 	pbempty "github.com/golang/protobuf/ptypes/empty"
 	structpb "github.com/golang/protobuf/ptypes/struct"
@@ -37,7 +38,7 @@ type cmd struct {
 	Environment map[string]string `pulumi:"environment,optional"`
 }
 
-const commandType = "command:exec:command"
+const commandType = "command:v1:exec"
 
 type cancellationContext struct {
 	context context.Context
@@ -80,6 +81,7 @@ func (p *commandProvider) prepare(req hasUrn, op string, props *structpb.Struct)
 }
 
 // execCommand runs the specified command and returns a proto structure containing stderr and stdout
+// if exitCode is zero and an error is returned, it is an internal error
 func (p *commandProvider) execCommand(ctx context.Context, req hasUrn, op string, props *structpb.Struct) (out *structpb.Struct, err error, code int) {
 	code = 0
 	input, err := p.prepare(req, op, props)
@@ -123,7 +125,7 @@ func (p *commandProvider) execCommand(ctx context.Context, req hasUrn, op string
 			glog.V(1).Infof("Command exit with code: %v", code)
 			code = exitError.ExitCode()
 		}
-
+		err = errors.Wrap(err, stderr.String())
 		return nil, err, code
 	}
 
@@ -186,17 +188,64 @@ func (p *commandProvider) Check(ctx context.Context, req *pulumirpc.CheckRequest
 	return &pulumirpc.CheckResponse{Inputs: req.GetNews()}, nil
 }
 
+type Input struct {
+	Compare string
+	Create  cmd
+	Read    cmd
+	Update  cmd
+	Delete  cmd
+}
+
+func isEmpty(item Input) bool {
+	if item.Compare == "" && len(item.Create.Command) == 0 && item.Read.Command == nil && item.Update.Command == nil && item.Delete.Command == nil {
+		return true
+	}
+	return false
+}
+
+type OldDiff struct {
+	Inputs Input
+}
+
 // Diff checks what impacts a hypothetical update will have on the resource's properties.
+// It first checks to see if inputs have changed. If they have not, it executes the diff command.
 func (p *commandProvider) Diff(ctx context.Context, req *pulumirpc.DiffRequest) (*pulumirpc.DiffResponse, error) {
+	urn := resource.URN(req.GetUrn())
+	label := fmt.Sprintf("%s.Diff(%s)", p.label(), urn)
+	glog.V(9).Infof("%s executing", label)
+
+	var oldDiff = OldDiff{}
+	olds := req.GetOlds()
+	news := req.GetNews()
+	err := structpbconv.Convert(olds, &oldDiff)
+	if err != nil {
+		return nil, errors.Wrap(err, "Could not convert input")
+	}
+	var newInput = Input{}
+	err = structpbconv.Convert(news, &newInput)
+	if err != nil {
+		return nil, errors.Wrap(err, "Could not convert input")
+	}
+
 	diff := pulumirpc.DiffResponse_DIFF_SOME
-	_, err, code := p.execCommand(ctx, req, "diff", req.GetNews())
-	// If the user doesn't provide a diff command, we never run update
-	if err != nil && err.Error() != "diff command unspecified" {
-		return nil, err
+
+	// check if old is nil, then diff update, then diff compare
+	wasEmpty := isEmpty(oldDiff.Inputs)
+	if wasEmpty || oldDiff.Inputs.Compare != newInput.Compare || !reflect.DeepEqual(oldDiff.Inputs.Update, newInput.Update) {
+		glog.V(1).Info("Diff reason")
+		diff = pulumirpc.DiffResponse_DIFF_SOME
+	} else {
+		_, err, code := p.execCommand(ctx, req, "diff", req.GetNews())
+		// If the user doesn't provide a diff command, we never run update
+		if err != nil && err.Error() != "diff command unspecified" {
+			return nil, err
+		}
+		if code != 0 || (err != nil && err.Error() == "diff command unspecified") {
+			// code is zero if no command specified or process returned update
+			diff = pulumirpc.DiffResponse_DIFF_NONE
+		}
 	}
-	if code == 0 {
-		diff = pulumirpc.DiffResponse_DIFF_NONE
-	}
+
 	return &pulumirpc.DiffResponse{
 		Replaces:            []string{},
 		Changes:             diff,
@@ -210,6 +259,9 @@ func (p *commandProvider) Create(ctx context.Context, req *pulumirpc.CreateReque
 	if err != nil {
 		return nil, err
 	}
+	// Save inputs to state
+	out.Fields["inputs"] = &structpb.Value{Kind: &structpb.Value_StructValue{StructValue: req.Properties}}
+
 	return &pulumirpc.CreateResponse{
 		Id: "id", Properties: out,
 	}, nil

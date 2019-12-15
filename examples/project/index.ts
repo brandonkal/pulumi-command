@@ -6,7 +6,7 @@ const cmd = new Command('demo', {
     command: ['true'],
   },
   create: {
-    command: ['ls'],
+    command: ['ls', '-lh'],
   },
   update: {
     command: ['bash', '-c', 'echo $VAR'],

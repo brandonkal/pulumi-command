@@ -12,6 +12,7 @@ popd
 
 pushd ./sdk/nodejs
 yarn install
+rm -rf bin
 yarn build
 yarn link
 popd

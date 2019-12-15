@@ -14,14 +14,22 @@
 // limitations under the License.
 
 import * as pulumi from '@pulumi/pulumi'
+import { createHash } from 'crypto'
+
+function hash(input: any) {
+  const str = JSON.stringify(input) || 'undefined'
+  return createHash('sha256')
+    .update(str)
+    .digest('hex')
+}
 
 export interface Cmd {
   /** Specifiy the command to run as an array of arguments */
-  readonly command: pulumi.Input<string[]>
+  command: pulumi.Input<string[]>
   /** Pass the stdin to a command */
-  readonly stdin?: pulumi.Input<string>
+  stdin?: pulumi.Input<string>
   /** Set environment variables for the running command */
-  readonly environment?: pulumi.Input<Record<string, string>>
+  environment?: pulumi.Input<Record<string, string>>
 }
 
 export interface CommandSet {
@@ -30,18 +38,33 @@ export interface CommandSet {
    * Exit 0 to run update.
    * Exit with a non-zero value or omit to disable update.
    * Hint: an easy method to always run update is to set diff to `['true']` */
-  readonly diff?: pulumi.Input<Cmd>
+  diff?: pulumi.Input<Cmd> | string[]
+  compare?: pulumi.Input<any>
   /** Define a command to create a resource. */
-  readonly create: pulumi.Input<Cmd>
+  create: pulumi.Input<Cmd> | string[]
   /** Define a command to create read the resource. */
-  readonly read?: pulumi.Input<Cmd>
+  read?: pulumi.Input<Cmd> | string[]
   /** If unspecified, create definition will be used. Define to provide an alternate update command. */
-  readonly update?: pulumi.Input<Cmd>
+  update?: pulumi.Input<Cmd> | string[]
   /** Define a command to delete the resource. If unspecified, a delete operation is a no-op. */
-  readonly delete?: pulumi.Input<Cmd>
+  delete?: pulumi.Input<Cmd> | string[]
 }
 
-/** Execute a command and save it as a resource */
+// fix unifies schema passed to the provider allowing for convenience array support
+function fix(item: any) {
+  return item ? (Array.isArray(item) ? { command: item } : item) : undefined
+}
+
+/** Execute a Command and save it as a resource.
+ *
+ * Each command can be specified as an object or a convenience array.
+ * If only `create` is specified, `update` will use the create definition.
+ * The `compare` property will be JSON serialized with a hash saved in the state. This is useful to ensure update is run if dependendent resources change.
+ *
+ * An update will occur in these cases:
+ * 1. The `compare` hash or the `update` arguments change.
+ * 2. The specified `diff` command exits with an error.
+ */
 export class Command extends pulumi.CustomResource {
   public readonly stdout: pulumi.Output<string>
   public readonly stderr: pulumi.Output<string>
@@ -51,11 +74,31 @@ export class Command extends pulumi.CustomResource {
     args: CommandSet,
     opts?: pulumi.CustomResourceOptions
   ) {
-    ;(args as any).stdout = undefined /* out */
-    ;(args as any).stderr = undefined /* out */
-    if (typeof args.update === 'undefined') {
-      ;(args as any).update = args.create
+    const inputs: CommandSet = {
+      create: fix(args.create),
+      read: fix(args.read),
+      update: fix(args.update),
+      delete: fix(args.delete),
+      diff: fix(args.diff),
     }
-    super('command:exec:command', name, args, opts)
+    ;(inputs as any).stdout = undefined /* out */
+    ;(inputs as any).stderr = undefined /* out */
+    if (typeof args.update === 'undefined') {
+      args.update = args.create
+    }
+    if (
+      typeof args.compare === 'undefined' &&
+      typeof args.compare !== 'string'
+    ) {
+      try {
+        inputs.compare = hash(args.compare)
+      } catch (e) {
+        throw new pulumi.RunError(`Could not serialize compare prop ${e}`)
+      }
+    }
+    if (inputs.create === undefined) {
+      throw new Error("Missing required property 'create'")
+    }
+    super('command:v1:exec', name, inputs, opts)
   }
 }

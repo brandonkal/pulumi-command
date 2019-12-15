@@ -41,11 +41,11 @@ func toPrimitive(src *structpb.Value) (reflect.Value, bool) {
 	}
 }
 
-func convertValue(src *structpb.Value, dst reflect.Value) error {
-	dst = reflect.Indirect(dst)
+func convertValue(src *structpb.Value, dest reflect.Value) error {
+	dst := reflect.Indirect(dest)
 	if v, ok := toPrimitive(src); ok {
 		if !v.Type().AssignableTo(dst.Type()) {
-			if !v.Type().AssignableTo(dst.Type()) {
+			if !v.Type().ConvertibleTo(dst.Type()) {
 				return fmt.Errorf("cannot assign %T to %s", src.GetKind(), dst.Type())
 			}
 			v = v.Convert(dst.Type())
@@ -63,8 +63,8 @@ func convertValue(src *structpb.Value, dst reflect.Value) error {
 	}
 }
 
-func convertList(src *structpb.ListValue, dst reflect.Value) error {
-	dst = reflect.Indirect(dst)
+func convertList(src *structpb.ListValue, dest reflect.Value) error {
+	dst := reflect.Indirect(dest)
 	if dst.Kind() != reflect.Slice {
 		return fmt.Errorf("cannot convert %T to %s", src, dst.Type())
 	}
@@ -82,24 +82,39 @@ func convertList(src *structpb.ListValue, dst reflect.Value) error {
 	return nil
 }
 
-func convertStruct(src *structpb.Struct, dst reflect.Value) error {
-	dst = reflect.Indirect(dst)
-	if dst.Kind() != reflect.Struct {
-		return fmt.Errorf("cannot convert %T to %s", src, dst.Type())
-	}
-	fields := src.GetFields()
-	for i := 0; i < dst.NumField(); i++ {
-		target := dst.Field(i)
-		field := dst.Type().Field(i)
-		name := field.Tag.Get(tagKey)
-		if name == "" {
-			name = strings.ToLower(field.Name)
-		}
-		if v, ok := fields[name]; ok {
-			if err := convertValue(v, target); err != nil {
-				return err
+func convertStruct(src *structpb.Struct, dest reflect.Value) error {
+	dst := reflect.Indirect(dest)
+	if dst.Kind() == reflect.Struct {
+		fields := src.GetFields()
+		for i := 0; i < dst.NumField(); i++ {
+			target := dst.Field(i)
+			field := dst.Type().Field(i)
+			name := field.Tag.Get(tagKey)
+			if name == "" {
+				name = strings.ToLower(field.Name)
+			}
+			if v, ok := fields[name]; ok {
+				if err := convertValue(v, target); err != nil {
+					return err
+				}
 			}
 		}
+		return nil
+	} else if dst.Kind() == reflect.Map {
+		elemType := dst.Type().Elem()
+		mapType := reflect.MapOf(reflect.TypeOf(string("")), elemType)
+		aMap := reflect.MakeMap(mapType)
+		fields := src.GetFields()
+		for key, value := range fields {
+			element := reflect.New(elemType).Elem()
+			if err := convertValue(value, element); err != nil {
+				return err
+			}
+			aMap.SetMapIndex(reflect.ValueOf(key), element)
+		}
+		dst.Set(aMap)
+		return nil
 	}
-	return nil
+
+	return fmt.Errorf("cannot convert %T to %s", src, dst.Type())
 }
