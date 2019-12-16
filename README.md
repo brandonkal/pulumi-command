@@ -6,7 +6,14 @@ It is important to ensure that the output of a command is deterministic. If it i
 
 ## Install
 
-After installing the node module into your pulumi project, you will need to install the go binary globally into your path.
+After installing the node module into your pulumi project, you will need to install the go binary globally.
+You may place it in your PATH or place it in the plugins directory:
+
+```sh
+cd cmd/pulumi-resource-command
+mkdir -p ~/.pulumi/plugins/resource-command-v1.0.4/
+go build && mv pulumi-resource-command ~/.pulumi/plugins/resource-command-v1.0.4/
+```
 
 ## Attribution
 

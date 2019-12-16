@@ -122,11 +122,12 @@ func (p *commandProvider) execCommand(ctx context.Context, req hasUrn, op string
 	err = cmd.Run()
 	if err != nil {
 		if exitError, ok := err.(*exec.ExitError); ok {
-			glog.V(1).Infof("Command exit with code: %v", code)
 			code = exitError.ExitCode()
+			err = errors.Wrap(err, stderr.String())
+			glog.V(1).Infof("Command exit with code: %v", code)
+		} else {
+			return nil, err, code
 		}
-		err = errors.Wrap(err, stderr.String())
-		return nil, err, code
 	}
 
 	m := make(map[string]*structpb.Value)
@@ -140,7 +141,7 @@ func (p *commandProvider) execCommand(ctx context.Context, req hasUrn, op string
 		Fields: m,
 	}
 
-	return out, nil, code
+	return out, err, code
 }
 
 // CheckConfig validates the configuration for this resource provider.
@@ -226,25 +227,39 @@ func (p *commandProvider) Diff(ctx context.Context, req *pulumirpc.DiffRequest) 
 	if err != nil {
 		return nil, errors.Wrap(err, "Could not convert input")
 	}
+	glog.V(9).Info("===OLD-DIFF===")
+	glog.V(9).Info(oldDiff)
+	glog.V(9).Info("===newInput===")
+	glog.V(9).Info(newInput)
 
-	diff := pulumirpc.DiffResponse_DIFF_SOME
-
-	// check if old is nil, then diff update, then diff compare
+	var needsUpdate = false
 	wasEmpty := isEmpty(oldDiff.Inputs)
-	if wasEmpty || oldDiff.Inputs.Compare != newInput.Compare || !reflect.DeepEqual(oldDiff.Inputs.Update, newInput.Update) {
-		glog.V(1).Info("Diff reason")
-		diff = pulumirpc.DiffResponse_DIFF_SOME
+	if !wasEmpty {
+		depChanged := oldDiff.Inputs.Compare != newInput.Compare
+		updateCmdChanged := !reflect.DeepEqual(oldDiff.Inputs.Update, newInput.Update)
+		glog.V(1).Infof("Diff check: depChanged: %v. updateCmdChanged: %v", depChanged, updateCmdChanged)
+		needsUpdate = depChanged || updateCmdChanged
 	} else {
-		_, err, code := p.execCommand(ctx, req, "diff", req.GetNews())
+		glog.V(1).Info("oldDiff empty")
+	}
+	if !needsUpdate {
+		_, err, code := p.execCommand(ctx, req, "diff", news)
 		// If the user doesn't provide a diff command, we never run update
-		if err != nil && err.Error() != "diff command unspecified" {
+		if err != nil && err.Error() != "diff command unspecified" && code == 0 {
 			return nil, err
 		}
-		if code != 0 || (err != nil && err.Error() == "diff command unspecified") {
-			// code is zero if no command specified or process returned update
-			diff = pulumirpc.DiffResponse_DIFF_NONE
+		unspecified := (err != nil && err.Error() == "diff command unspecified")
+		if code == 0 && !unspecified {
+			// code is zero if no command specified or process returned success (update)
+			needsUpdate = true
+			glog.V(1).Infof("Diff check update required: return code: %v. unspecified? %v", code, unspecified)
 		}
 	}
+	diff := pulumirpc.DiffResponse_DIFF_SOME
+	if !needsUpdate {
+		diff = pulumirpc.DiffResponse_DIFF_NONE
+	}
+	glog.V(1).Infof("Diff check needs update: %v", needsUpdate)
 
 	return &pulumirpc.DiffResponse{
 		Replaces:            []string{},
@@ -286,10 +301,13 @@ func (p *commandProvider) Read(ctx context.Context, req *pulumirpc.ReadRequest) 
 }
 
 func (p *commandProvider) Update(ctx context.Context, req *pulumirpc.UpdateRequest) (*pulumirpc.UpdateResponse, error) {
-	out, err, _ := p.execCommand(ctx, req, "update", req.GetNews())
+	news := req.GetNews()
+	out, err, _ := p.execCommand(ctx, req, "update", news)
 	if err != nil {
 		return nil, err
 	}
+	// Save inputs to state
+	out.Fields["inputs"] = &structpb.Value{Kind: &structpb.Value_StructValue{StructValue: news}}
 	return &pulumirpc.UpdateResponse{Properties: out}, nil
 }
 
