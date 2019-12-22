@@ -11,12 +11,12 @@ You may place it in your PATH or place it in the plugins directory:
 
 ```sh
 cd cmd/pulumi-resource-command
-mkdir -p ~/.pulumi/plugins/resource-command-v1.0.4/
-go build && mv pulumi-resource-command ~/.pulumi/plugins/resource-command-v1.0.4/
+mkdir -p ~/.pulumi/plugins/resource-command-v1.0.5/
+go build && mv pulumi-resource-command ~/.pulumi/plugins/resource-command-v1.0.5/
 ```
 
 ## Attribution
 
-Thank you to [Luke Hoban @lukehoban](https://github.com/lukehoban) for his help answering my Pulumi questions on Slack.
+Thank you to [Luke Hoban](https://github.com/lukehoban) for his help answering my Pulumi questions on Slack.
 
 © Brandon Kalinowski. Apache-2.0.

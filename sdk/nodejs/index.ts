@@ -84,7 +84,7 @@ export class Command extends pulumi.CustomResource {
     ;(inputs as any).stdout = undefined /* out */
     ;(inputs as any).stderr = undefined /* out */
     if (typeof args.update === 'undefined') {
-      args.update = args.create
+      inputs.update = args.create
     }
     if (
       typeof args.compare === 'undefined' &&
