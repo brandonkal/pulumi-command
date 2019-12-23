@@ -1,6 +1,5 @@
 //
-// conv.go
-//
+// Copyright (c) 2019 Brandon Kalinowski
 // Copyright (c) 2016 Junpei Kawamoto
 //
 // This software is released under the MIT License.

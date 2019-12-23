@@ -159,7 +159,7 @@ func (p *commandProvider) DiffConfig(ctx context.Context, req *pulumirpc.DiffReq
 // Configure configures the resource provider with "globals" that control its behavior.
 func (p *commandProvider) Configure(ctx context.Context, req *pulumirpc.ConfigureRequest) (*pulumirpc.ConfigureResponse, error) {
 	return &pulumirpc.ConfigureResponse{
-		AcceptSecrets: true,
+		AcceptSecrets: false,
 	}, nil
 }
 
