@@ -1,0 +1,10 @@
+/Users/mitch.maler/Downloads/pulumi-command/sdk/dotnet/bin/Debug/netcoreapp3.0/Pulumi.Command.deps.json
+/Users/mitch.maler/Downloads/pulumi-command/sdk/dotnet/bin/Debug/netcoreapp3.0/Pulumi.Command.dll
+/Users/mitch.maler/Downloads/pulumi-command/sdk/dotnet/bin/Debug/netcoreapp3.0/Pulumi.Command.pdb
+/Users/mitch.maler/Downloads/pulumi-command/sdk/dotnet/bin/Debug/netcoreapp3.0/Pulumi.Command.xml
+/Users/mitch.maler/Downloads/pulumi-command/sdk/dotnet/obj/Debug/netcoreapp3.0/Pulumi.Command.csprojAssemblyReference.cache
+/Users/mitch.maler/Downloads/pulumi-command/sdk/dotnet/obj/Debug/netcoreapp3.0/Pulumi.Command.AssemblyInfoInputs.cache
+/Users/mitch.maler/Downloads/pulumi-command/sdk/dotnet/obj/Debug/netcoreapp3.0/Pulumi.Command.AssemblyInfo.cs
+/Users/mitch.maler/Downloads/pulumi-command/sdk/dotnet/obj/Debug/netcoreapp3.0/Pulumi.Command.dll
+/Users/mitch.maler/Downloads/pulumi-command/sdk/dotnet/obj/Debug/netcoreapp3.0/Pulumi.Command.xml
+/Users/mitch.maler/Downloads/pulumi-command/sdk/dotnet/obj/Debug/netcoreapp3.0/Pulumi.Command.pdb
