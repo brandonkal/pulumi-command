@@ -1,4 +1,4 @@
-// Pulumi Command Provider Node SDK
+// Pulumi Command Provider .NET SDK
 // Copyright 2020, Mitchell Maler.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
