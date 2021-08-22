@@ -4,15 +4,47 @@ This is a simple Pulumi provider that allows one to run arbitrary commands and t
 
 It is important to ensure that the output of a command is deterministic. If it is not, use the diff command to ensure the net results are deterministic. The output of the update and and create commands should remain the same (not just the command effects). See the examples for usage details.
 
-## Install
+## Usage
 
-After installing the node module into your pulumi project, you will need to install the go binary globally.
-You may place it in your PATH or place it in the plugins directory:
+See [./examples](./examples) folder for examples of pluing usage for available runtimes.
+
+> Note: `python` and `nodejs` runtimes will pull required plugin binaries automatically, for `dotnet` and `go` runtimes check [Installation](#Installation) instruction below
+
+## Installation
+
+Find available versions on [releases](https://github.com/brandonkal/pulumi-command/releases) page and install prebuild plugin with this command:
+```sh
+pulumi plugin install resource command v<version> --server https://github.com/brandonkal/pulumi-command/releases/download/v<version>/
+```
+
+To build and install plugin from source you can do this:
+
+1. Checkout this repo
+2. Run this commands:
 
 ```sh
-cd cmd/pulumi-resource-command
-mkdir -p ~/.pulumi/plugins/resource-command-v1.0.5/
-go build && mv pulumi-resource-command ~/.pulumi/plugins/resource-command-v1.0.5/
+make provider
+make install
+```
+
+## Developing
+
+### Pre-requisites
+
+Install the `pulumictl` cli from the [releases](https://github.com/pulumi/pulumictl/releases) page or follow the [install instructions](https://github.com/pulumi/pulumictl#installation)
+
+> NB: Usage of `pulumictl` is optional. If not using it, hard code the version in the [Makefile](Makefile) of when building explicitly pass version as `VERSION=0.0.1 make build`
+
+### Build and Test
+
+```bash
+# build and install the resource provider plugin
+$ make build install
+# test
+$ cd examples/simple
+$ npm install
+$ pulumi stack init test
+$ pulumi up
 ```
 
 ## Attribution
