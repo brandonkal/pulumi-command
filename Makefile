@@ -48,8 +48,9 @@ test_provider::
 dotnet_sdk:: DOTNET_VERSION := $(shell pulumictl get version --language dotnet)
 dotnet_sdk:: export SDK_DIR = ${PACKDIR}
 dotnet_sdk::
-	rm -rf ${PACKDIR}/dotnet && mkdir -p ${PACKDIR}/dotnet && touch ${PACKDIR}/dotnet/go.mod
-	$(WORKING_DIR)/bin/$(CODEGEN) -version=${DOTNET_VERSION} dotnet $(SCHEMA_FILE) $(CURDIR)
+	# disable rebuild for now to preserve previous sdk
+	# rm -rf ${PACKDIR}/dotnet && mkdir -p ${PACKDIR}/dotnet && touch ${PACKDIR}/dotnet/go.mod
+	# $(WORKING_DIR)/bin/$(CODEGEN) -version=${DOTNET_VERSION} dotnet $(SCHEMA_FILE) $(CURDIR)
 	cd ${PACKDIR}/dotnet/&& \
 		echo "${DOTNET_VERSION}" >version.txt && \
 		dotnet build /p:Version=${DOTNET_VERSION}
@@ -62,8 +63,9 @@ go_sdk::
 nodejs_sdk:: NODE_VERSION := $(shell pulumictl get version --language javascript)
 nodejs_sdk:: export SDK_DIR = ${PACKDIR}
 nodejs_sdk::
-	rm -rf ${PACKDIR}/nodejs && mkdir -p ${PACKDIR}/nodejs && touch ${PACKDIR}/nodejs/go.mod
-	$(WORKING_DIR)/bin/$(CODEGEN) -version=${VERSION} nodejs $(SCHEMA_FILE) $(CURDIR)
+	# disable rebuild for now to preserve previous sdk
+	# rm -rf ${PACKDIR}/nodejs && mkdir -p ${PACKDIR}/nodejs && touch ${PACKDIR}/nodejs/go.mod
+	# $(WORKING_DIR)/bin/$(CODEGEN) -version=${VERSION} nodejs $(SCHEMA_FILE) $(CURDIR)
 	cd ${PACKDIR}/nodejs/ && \
 		yarn install && \
 		yarn run tsc
@@ -132,5 +134,5 @@ install_go_sdk::
 	#target intentionally blank
 
 install_nodejs_sdk::
-	# -yarn unlink --cwd $(WORKING_DIR)/${PACKDIR}/nodejs/bin
-	# yarn link --cwd $(WORKING_DIR)/${PACKDIR}/nodejs/bin
+	-yarn unlink --cwd $(WORKING_DIR)/${PACKDIR}/nodejs/bin
+	yarn link --cwd $(WORKING_DIR)/${PACKDIR}/nodejs/bin

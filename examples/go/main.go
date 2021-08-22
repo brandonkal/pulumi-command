@@ -7,7 +7,6 @@ import (
 
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
-		// Create a new security group for port 80.
 		exec, err := command.NewCommand(ctx, "demo", &command.CommandArgs{
 			Create: command.CmdArgs{
 				Command: pulumi.ToStringArray([]string{"bash", "-c", "echo 'mytest111' > /tmp/mytest.txt"}),

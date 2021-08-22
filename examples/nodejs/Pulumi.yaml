@@ -1,3 +1,5 @@
 name: command-test
 description: A Command Test.
 runtime: nodejs
+backend:
+  url: file://.
