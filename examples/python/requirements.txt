@@ -1,0 +1,2 @@
+pulumi>=3.5.1,<4.0.0
+-e ../../sdk/python/bin/
