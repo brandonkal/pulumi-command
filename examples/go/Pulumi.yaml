@@ -1,0 +1,5 @@
+name: command-test
+description: A Command Test.
+runtime: go
+backend:
+  url: file://.

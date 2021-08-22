@@ -1,0 +1,29 @@
+archives:
+  - id: archive
+    name_template: '{{ .Binary }}-{{ .Tag }}-{{ .Os }}-{{ .Arch }}'
+before:
+  hooks:
+    - make gen
+    - make provider
+builds:
+  - binary: pulumi-resource-command
+    dir: provider
+    env:
+      - CGO_ENABLED=0
+      - GO111MODULE=on
+    goarch:
+      - amd64
+      - arm64
+    goos:
+      - darwin
+      - windows
+      - linux
+    ldflags:
+      - -X github.com/brandonkal/pulumi-command/provider/pkg/version.Version={{.Tag}}
+    main: ./cmd/pulumi-resource-command/
+changelog:
+  skip: true
+release:
+  disable: false
+snapshot:
+  name_template: '{{ .Tag }}-SNAPSHOT'
