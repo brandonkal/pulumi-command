@@ -6,7 +6,7 @@ It is important to ensure that the output of a command is deterministic. If it i
 
 ## Usage
 
-See [./examples](./examples) folder for examples of pluing usage for available runtimes.
+See [./examples](./examples) folder for examples of plugin usage for available runtimes.
 
 > Note: `python` and `nodejs` runtimes will pull required plugin binaries automatically, for `dotnet` and `go` runtimes check [Installation](#Installation) instruction below
 
