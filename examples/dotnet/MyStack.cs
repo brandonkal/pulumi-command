@@ -27,15 +27,18 @@ class MyStack : Stack
             {
                 Command =
                 {
-                    "true"
+                    "bash",
+                    "-c",
+                    "test 'mytest111' != \"$(cat /tmp/mytest.txt)\""
                 }
             },
             Create = new CommandSet.CommandArgs
             {
                 Command =
                 {
-                    "ls",
-                    "-lh"
+                    "bash",
+                    "-c",
+                    "echo 'mytest111' > /tmp/mytest.txt"
                 }
             },
             Update = new CommandSet.CommandArgs
@@ -44,18 +47,22 @@ class MyStack : Stack
                 {
                     "bash",
                     "-c",
-                    "echo $VAR"
+                    "echo $VAR > /tmp/mytest.txt"
                 },
                 Environment =
                 {
-                    {"VAR", "Hello Pulumi!"}
+                    {"VAR", "mytest111"}
                 }
             },
         });
 
-        Stdout = test.StdOut;
+        this.Stdout = test.StdOut;
+        this.Stderr = test.StdErr;
     }
 
     [Output]
     public Output<string> Stdout { get; set; }
+
+    [Output]
+    public Output<string> Stderr { get; set; }
 }

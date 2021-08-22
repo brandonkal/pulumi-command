@@ -123,9 +123,9 @@ test_all::
 	cd tests/sdk/go && $(GO_TEST) ./...
 
 install_dotnet_sdk::
-	# rm -rf $(WORKING_DIR)/nuget/$(NUGET_PKG_NAME).*.nupkg
-	# mkdir -p $(WORKING_DIR)/nuget
-	# find . -name '*.nupkg' -print -exec cp -p {} ${WORKING_DIR}/nuget \;
+	rm -rf $(WORKING_DIR)/nuget/$(NUGET_PKG_NAME).*.nupkg
+	mkdir -p $(WORKING_DIR)/nuget
+	find . -name '*.nupkg' -print -exec cp -p {} ${WORKING_DIR}/nuget \;
 
 install_python_sdk::
 	#target intentionally blank
