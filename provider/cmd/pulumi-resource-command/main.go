@@ -12,23 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package provider
+package main
 
 import (
-	"github.com/pulumi/pulumi/pkg/resource/provider"
-	"github.com/pulumi/pulumi/pkg/util/cmdutil"
-	lumirpc "github.com/pulumi/pulumi/sdk/proto/go"
+	"github.com/brandonkal/pulumi-command/provider/pkg/provider"
+	"github.com/brandonkal/pulumi-command/provider/pkg/version"
 )
 
-// Serve launches the gRPC server for the Pulumi Kubernetes resource provider.
-func Serve(providerName, version string) {
-	// Start gRPC service.
-	err := provider.Main(
-		providerName, func(host *provider.HostClient) (lumirpc.ResourceProviderServer, error) {
-			return makeCommandProvider(providerName, version)
-		})
+var providerName = "command"
 
-	if err != nil {
-		cmdutil.ExitError(err.Error())
-	}
+func main() {
+	provider.Serve(providerName, version.Version)
 }
