@@ -1,3 +1,5 @@
 name: command-test
 runtime: dotnet
 description: A Command Test.
+backend:
+  url: file://.
