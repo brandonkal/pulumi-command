@@ -21,6 +21,10 @@ class MyStack : Stack
 {
     public MyStack()
     {
+        var config = new Pulumi.Config();
+        var dir = config.Get("dir") ?? "/tmp";
+        var content = config.Get("content") ?? "mytest111";
+
         var test = new Command("testCommand", new CommandSet
         {
             Diff = new CommandSet.CommandArgs
@@ -29,7 +33,7 @@ class MyStack : Stack
                 {
                     "bash",
                     "-c",
-                    "test 'mytest111' != \"$(cat /tmp/mytest.txt)\""
+                    $"test '{content}' != \"$(cat {dir}/mytest.txt)\""
                 }
             },
             Create = new CommandSet.CommandArgs
@@ -38,7 +42,7 @@ class MyStack : Stack
                 {
                     "bash",
                     "-c",
-                    "echo 'mytest111' > /tmp/mytest.txt"
+                    $"echo '{content}' > {dir}/mytest.txt"
                 }
             },
             Update = new CommandSet.CommandArgs
@@ -47,11 +51,11 @@ class MyStack : Stack
                 {
                     "bash",
                     "-c",
-                    "echo $VAR > /tmp/mytest.txt"
+                    $"echo $VAR > {dir}/mytest.txt"
                 },
                 Environment =
                 {
-                    {"VAR", "mytest111"}
+                    {"VAR", $"{content}"}
                 }
             },
         });
