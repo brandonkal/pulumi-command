@@ -20,10 +20,10 @@ import (
 	"testing"
 
 	"github.com/golang/protobuf/jsonpb"
-	pulumirpc "github.com/pulumi/pulumi/sdk/proto/go"
+	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-var json string = "{\"id\":\"id\",\"urn\":\"urn:pulumi:command-test::command-test::command:exec:command::demo\",\"olds\":{\"inputs\":{\"compare\":\"eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c\",\"create\":{\"command\":[\"ls\"]},\"diff\":{\"command\":[\"true\"]},\"update\":{\"command\":[\"bash\",\"-c\",\"echo $VAR\"],\"environment\":{\"VAR\":\"Hello Pulumi!\"}}},\"stderr\":\"\",\"stdout\":\"Pulumi.command-test.yaml\\nPulumi.yaml\\nindex.ts\\nnode_modules\\npackage.json\\ntsconfig.json\\nyarn.lock\\n\"},\"news\":{\"compare\":\"eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c\",\"create\":{\"command\":[\"ls\"]},\"diff\":{\"command\":[\"true\"]},\"update\":{\"command\":[\"bash\",\"-c\",\"echo $VAR\"],\"environment\":{\"VAR\":\"Hello Pulumi!\"}}}}"
+var json string = "{\"id\":\"id\",\"urn\":\"urn:pulumi:command-test::command-test::command:v1:exec::demo\",\"olds\":{\"inputs\":{\"compare\":\"eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c\",\"create\":{\"command\":[\"ls\"]},\"diff\":{\"command\":[\"bash\",\"-c\",\"exit 1\"]},\"update\":{\"command\":[\"bash\",\"-c\",\"echo $VAR\"],\"environment\":{\"VAR\":\"Hello Pulumi!\"}}},\"stderr\":\"\",\"stdout\":\"Pulumi.command-test.yaml\\nPulumi.yaml\\nindex.ts\\nnode_modules\\npackage.json\\ntsconfig.json\\nyarn.lock\\n\"},\"news\":{\"compare\":\"eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c\",\"create\":{\"command\":[\"ls\"]},\"diff\":{\"command\":[\"bash\",\"-c\",\"exit 1\"]},\"update\":{\"command\":[\"bash\",\"-c\",\"echo $VAR\"],\"environment\":{\"VAR\":\"Hello Pulumi!\"}}}}"
 
 func Test_commandProvider_Diff(t *testing.T) {
 	var req *pulumirpc.DiffRequest = &pulumirpc.DiffRequest{}
@@ -59,6 +59,10 @@ func Test_commandProvider_Diff(t *testing.T) {
 				ctx: context.Background(),
 				req: req,
 			},
+			want: &pulumirpc.DiffResponse{
+				Changes:             pulumirpc.DiffResponse_DIFF_NONE,
+				DeleteBeforeReplace: true,
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -73,7 +77,7 @@ func Test_commandProvider_Diff(t *testing.T) {
 				t.Errorf("commandProvider.Diff() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if !reflect.DeepEqual(got.Changes, tt.want.Changes) {
 				t.Errorf("commandProvider.Diff() = %v, want %v", got, tt.want)
 			}
 		})

@@ -11,14 +11,13 @@
 package structpbconv
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/golang/protobuf/jsonpb"
-	pulumirpc "github.com/pulumi/pulumi/sdk/proto/go"
+	pulumirpc "github.com/pulumi/pulumi/sdk/v3/proto/go"
 )
 
-var json string = "{\"id\":\"id\",\"urn\":\"urn:pulumi:command-test::command-test::command:exec:command::demo\",\"olds\":{\"inputs\":{\"compare\":\"eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c\",\"create\":{\"command\":[\"ls\"]},\"diff\":{\"command\":[\"true\"]},\"update\":{\"command\":[\"bash\",\"-c\",\"echo $VAR\"],\"environment\":{\"VAR\":\"Hello Pulumi!\"}}},\"stderr\":\"\",\"stdout\":\"Pulumi.command-test.yaml\\nPulumi.yaml\\nindex.ts\\nnode_modules\\npackage.json\\ntsconfig.json\\nyarn.lock\\n\"},\"news\":{\"compare\":\"eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c\",\"create\":{\"command\":[\"ls\"]},\"diff\":{\"command\":[\"true\"]},\"update\":{\"command\":[\"bash\",\"-c\",\"echo $VAR\"],\"environment\":{\"VAR\":\"Hello Pulumi!\"}}}}"
+var json string = "{\"id\":\"id\",\"urn\":\"urn:pulumi:command-test::command-test::command:v1:exec::demo\",\"olds\":{\"inputs\":{\"compare\":\"eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c\",\"create\":{\"command\":[\"ls\"]},\"diff\":{\"command\":[\"true\"]},\"update\":{\"command\":[\"bash\",\"-c\",\"echo $VAR\"],\"environment\":{\"VAR\":\"Hello Pulumi!\"}}},\"stderr\":\"\",\"stdout\":\"Pulumi.command-test.yaml\\nPulumi.yaml\\nindex.ts\\nnode_modules\\npackage.json\\ntsconfig.json\\nyarn.lock\\n\"},\"news\":{\"compare\":\"eb045d78d273107348b0300c01d29b7552d622abbc6faf81b3ec55359aa9950c\",\"create\":{\"command\":[\"ls\"]},\"diff\":{\"command\":[\"true\"]},\"update\":{\"command\":[\"bash\",\"-c\",\"echo $VAR\"],\"environment\":{\"VAR\":\"Hello Pulumi!\"}}}}"
 
 type Input struct {
 	Create cmd
@@ -63,7 +62,7 @@ func TestConvert(t *testing.T) {
 			if err := Convert(news, &dst); (err != nil) != tt.wantErr {
 				t.Errorf("Convert() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			fmt.Print(dst)
+			t.Log(dst)
 		})
 	}
 }

@@ -14,7 +14,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/golang/protobuf/ptypes/struct"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 )
 
 // tagKey defines a structure tag name for ConvertStructPB.

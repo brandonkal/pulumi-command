@@ -1,0 +1,137 @@
+{
+    "name": "command",
+    "description": "A Pulumi resource provider for running commands",
+    "keywords": [
+        "pulumi",
+        "command"
+    ],
+    "homepage": "https://github.com/brandonkal/pulumi-command",
+    "license": "Apache-2.0",
+    "repository": "https://github.com/brandonkal/pulumi-command",
+    "meta": {
+        "moduleFormat": "(.*)(?:/[^/]*)"
+    },
+    "types": {
+        "command:v1:Cmd": {
+            "description": "Command specification",
+            "properties": {
+                "command": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Specifiy the command to run as an array of arguments"
+                },
+                "stdin": {
+                    "type": "string",
+                    "description": "Pass the stdin to a command"
+                },
+                "environment": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            },
+            "type": "object",
+            "required": [
+                "command"
+            ]
+        }
+    },
+    "resources": {
+        "command:v1:Command": {
+            "description": "Execute a Command and save it as a resource.\n\nEach command can be specified as an object or a convenience array. If only `create` is specified, `update` will use the create definition. The `compare` property will be JSON serialized with a hash saved in the state. This is useful to ensure update is run if dependendent resources change.\n\nAn update will occur in these cases:\n1. The `compare` hash or the `update` arguments change.\n2. The specified `diff` command exits with an error.",
+            "properties": {
+                "diff": {
+                    "description": "Specify a command to run to diff the resource.\n\nExit 0 to run update.\nExit with a non-zero value or omit to disable update.\nHint: an easy method to always run update is to set diff to `['true']`",
+                    "$ref": "#/types/command:v1:Cmd"
+                },
+                "create": {
+                    "type": "object",
+                    "description": "Define a command to create a resource.",
+                    "$ref": "#/types/command:v1:Cmd"
+                },
+                "read": {
+                    "type": "object",
+                    "description": "Define a command to create read the resource.",
+                    "$ref": "#/types/command:v1:Cmd"
+                },
+                "update": {
+                    "type": "object",
+                    "description": "If unspecified, create definition will be used. Define to provide an alternate update command.",
+                    "$ref": "#/types/command:v1:Cmd"
+                },
+                "delete": {
+                    "type": "object",
+                    "desсription": "Define a command to delete the resource. If unspecified, a delete operation is a no-op.",
+                    "$ref": "#/types/command:v1:Cmd"
+                },
+                "compare": {
+                    "type": "string"
+                },
+                "stdout": {
+                    "type": "string",
+                    "description": "stdout of the command"
+                },
+                "stderr": {
+                    "type": "string",
+                    "description": "stderr of the command"
+                }
+            },
+            "inputProperties": {
+                "diff": {
+                    "description": "Specify a command to run to diff the resource.\n\nExit 0 to run update.\nExit with a non-zero value or omit to disable update.\nHint: an easy method to always run update is to set diff to `['true']`",
+                    "$ref": "#/types/command:v1:Cmd"
+                },
+                "create": {
+                    "type": "object",
+                    "description": "Define a command to create a resource.",
+                    "$ref": "#/types/command:v1:Cmd"
+                },
+                "read": {
+                    "type": "object",
+                    "description": "Define a command to create read the resource.",
+                    "$ref": "#/types/command:v1:Cmd"
+                },
+                "update": {
+                    "type": "object",
+                    "description": "If unspecified, create definition will be used. Define to provide an alternate update command.",
+                    "$ref": "#/types/command:v1:Cmd"
+                },
+                "delete": {
+                    "type": "object",
+                    "desсription": "Define a command to delete the resource. If unspecified, a delete operation is a no-op.",
+                    "$ref": "#/types/command:v1:Cmd"
+                }
+            },
+            "requiredInputs": [
+                "create"
+            ]
+        }
+    },
+    "language": {
+        "csharp": {
+            "packageReferences": {
+                "Glob": "1.1.5",
+                "Pulumi": "3.*"
+            }
+        },
+        "go": {
+            "importBasePath": "github.com/brandonkal/pulumi-command/sdk/go/command"
+        },
+        "nodejs": {
+            "packageName": "@brandonkal/pulumi-command",
+            "dependencies": {
+                "@pulumi/pulumi": "^3.0.0"
+            },
+            "readme": "Execute a Command and save it as a resource.\n\nEach command can be specified as an object or a convenience array. If only `create` is specified, `update` will use the create definition. The `compare` property will be JSON serialized with a hash saved in the state. This is useful to ensure update is run if dependendent resources change.\n\nAn update will occur in these cases:\n1. The `compare` hash or the `update` arguments change.\n2. The specified `diff` command exits with an error."
+        },
+        "python": {
+            "readme": "Execute a Command and save it as a resource.\n\nEach command can be specified as an object or a convenience array. If only `create` is specified, `update` will use the create definition. The `compare` property will be JSON serialized with a hash saved in the state. This is useful to ensure update is run if dependendent resources change.\n\nAn update will occur in these cases:\n1. The `compare` hash or the `update` arguments change.\n2. The specified `diff` command exits with an error.",
+            "requires": {
+                "pulumi": "\u003e=3.0.0,\u003c4.0.0"
+            }
+        }
+    }
+}
