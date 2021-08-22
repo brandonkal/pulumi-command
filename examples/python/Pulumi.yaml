@@ -1,0 +1,8 @@
+name: command-test
+description: A Command Test.
+runtime:
+  name: python
+  options:
+    virtualenv: venv
+backend:
+  url: file://.
