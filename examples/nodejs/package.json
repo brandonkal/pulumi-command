@@ -7,13 +7,8 @@
   "scripts": {
     "build": "tsc"
   },
-  "peerDependencies": {
-    "@brandonkal/pulumi-command": "latest"
-  },
-  "devDependencies": {
-    "typescript": "^3.7.2"
-  },
   "dependencies": {
-    "@pulumi/pulumi": "^1.6.1"
+    "@pulumi/pulumi": "^3.0.0",
+    "@brandonkal/pulumi-command": "file:../../sdk/nodejs/bin"
   }
 }
