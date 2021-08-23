@@ -50,6 +50,8 @@ func TestIntegration(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 
+			os.Setenv("PULUMI_CONFIG_PASSPHRASE", "")
+
 			ctx := context.Background()
 			stackName := "test"
 			workDir := filepath.Join(".", tc.stackPath)

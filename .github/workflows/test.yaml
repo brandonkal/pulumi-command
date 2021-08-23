@@ -1,0 +1,46 @@
+name: Tests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-dotnet@v1.8.1
+        with:
+          dotnet-version: '5.0.x'
+      - uses: actions/setup-go@v2.1.3
+        with:
+          go-version: '1.17'
+      - uses: actions/setup-node@v2.4.0
+        with:
+          node-version: '14'
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: go-${{ hashFiles('provider/go.sum') }}
+          restore-keys: |
+            go-
+
+      - name: Build Provider and SDKs
+        run: |
+          make build VERSION=0.0.1-dev.1 DOTNET_VERSION=0.0.1-dev.1 PYPI_VERSION=0.0.1dev1
+          make install VERSION=0.0.1-dev.1
+
+      - name: Run tests
+        env:
+          PULUMI_CONFIG_PASSPHRASE: "secret"
+        run: |
+          make test_all

@@ -58,6 +58,14 @@ class MyStack : Stack
                     {"VAR", $"{content}"}
                 }
             },
+            Delete = new CommandSet.CommandArgs
+            {
+                Command =
+                {
+                    "rm",
+                    $"{dir}/mytest.txt"
+                }
+            },
         });
 
         this.Stdout = test.StdOut;

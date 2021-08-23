@@ -1,6 +1,6 @@
 {
   "name": "@brandonkal/pulumi-command",
-  "version": "1.1.0",
+  "version": "${VERSION}",
   "description": "A Pulumi package for running arbitrary commands.",
   "license": "Apache-2.0",
   "keywords": [
@@ -15,7 +15,7 @@
   "pulumi": {
     "name": "command",
     "resource": true,
-    "pluginDownloadURL": "https://github.com/brandonkal/pulumi-command/releases/download/1.1.0/"
+    "pluginDownloadURL": "https://github.com/brandonkal/pulumi-command/releases/download/${VERSION}/"
   },
   "devDependencies": {
     "typescript": "^3.7.2"
