@@ -1,4 +1,4 @@
-module github.com/brandonkal/pulumi-command/test
+module github.com/brandonkal/pulumi-command/tests
 
 go 1.16
 

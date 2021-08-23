@@ -6,7 +6,6 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://pulumi.io</PackageProjectUrl>
     <RepositoryUrl>https://github.com/brandonkal/pulumi-command</RepositoryUrl>
-    <Version>1.1.0</Version>
 
     <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>

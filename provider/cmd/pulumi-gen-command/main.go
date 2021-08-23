@@ -106,7 +106,7 @@ func readSchema(schemaPath string, version string) *schema.Package {
 		panic(err)
 	}
 	pkgSpec.Version = version
-	pkgSpec.PluginDownloadURL = fmt.Sprintf("%s/releases/download/%s/", pkgSpec.Repository, version)
+	pkgSpec.PluginDownloadURL = fmt.Sprintf("%s/releases/download/%s/", pkgSpec.Repository, "${PLUGIN_VERSION}")
 
 	pkg, err := schema.ImportSpec(pkgSpec, nil)
 	if err != nil {

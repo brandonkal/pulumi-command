@@ -1,8 +1,5 @@
 .PHONY: test
 
-test:
-	./scripts/test.sh
-
 PROJECT_NAME := Pulumi Command Resource Provider
 
 PACK             := command
@@ -70,7 +67,7 @@ nodejs_sdk::
 		yarn install && \
 		yarn run tsc
 	cp README.md LICENSE ${PACKDIR}/nodejs/package.json ${PACKDIR}/nodejs/yarn.lock ${PACKDIR}/nodejs/bin/
-	sed -i.bak 's/$${VERSION}/$(VERSION)/g' ${PACKDIR}/nodejs/bin/package.json
+	sed -i.bak -e 's/$${VERSION}/$(VERSION)/g' -e 's/$${PLUGIN_VERSION}/$(VERSION)/g' ${PACKDIR}/nodejs/bin/package.json
 
 python_sdk:: PYPI_VERSION := $(shell pulumictl get version --language python)
 python_sdk:: export SDK_DIR = ${PACKDIR}
@@ -83,7 +80,7 @@ python_sdk::
 	cd ${PACKDIR}/python/ && \
 		python3 setup.py clean --all 2>/dev/null && \
 		rm -rf ./bin/ ../python.bin/ && cp -R . ../python.bin && mv ../python.bin ./bin && \
-		sed -i.bak -e 's/^VERSION = .*/VERSION = "$(PYPI_VERSION)"/g' -e 's/^PLUGIN_VERSION = .*/PLUGIN_VERSION = "$(VERSION)"/g' ./bin/setup.py && \
+		sed -i.bak -e 's/^VERSION = .*/VERSION = "$(PYPI_VERSION)"/g' -e 's/^PLUGIN_VERSION = .*/PLUGIN_VERSION = "$(VERSION)"/g' -e 's/$${PLUGIN_VERSION}/$(VERSION)/g' ./bin/setup.py && \
 		rm ./bin/setup.py.bak && \
 		cd ./bin && python3 setup.py build sdist
 
@@ -103,8 +100,8 @@ install::
 	mkdir -p ${PLUGIN_LINK} && rm -rf ${PLUGIN_LINK}
 	cp -r ${PROVIDER_BIN} ${PLUGIN_LINK}
 
-GO_TEST_FAST := go test -short -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM}
-GO_TEST 	 := go test -v -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM}
+GO_TEST_FAST := go test -short -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM}
+GO_TEST 	 := go test -count=1 -cover -timeout 2h -parallel ${TESTPARALLELISM}
 
 test_fast::
 # TODO: re-enable this test once https://github.com/pulumi/pulumi/issues/4954 is fixed.
